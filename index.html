@@ -71,6 +71,7 @@
             try {
                 const res = await fetch('./stockConfig.json');
                 const list = await res.json();
+                list.sort((a, b) => parseInt(a.stockId) - parseInt(b.stockId));
                 render(list);
             } catch (err) {
                 document.getElementById('stockList').innerHTML = '<p style="color:red;">读取配置失败</p>';
