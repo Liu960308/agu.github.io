@@ -39,6 +39,26 @@
             font-weight: bold;
             color: #2d3748;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* 板块标签样式 */
+        .plate-tag {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: normal;
+        }
+        .tag-main {
+            background-color: #48bb78; /* 沪深主板-绿色 */
+        }
+        .tag-gem {
+            background-color: #ed8936; /* 创业板-橙色 */
+        }
+        .tag-tech {
+            background-color: #9f7aea; /* 科创板-紫色 */
         }
         .stock-code {
             color: #3182ce;
@@ -92,15 +112,29 @@
             }
         }
 
+        // 获取股票板块标签
+        function getPlateTag(code) {
+            if (code.startsWith('688')) {
+                return '<span class="plate-tag tag-tech">科创板</span>';
+            } else if (code.startsWith('300')) {
+                return '<span class="plate-tag tag-gem">创业板</span>';
+            } else if (code.startsWith('6') || code.startsWith('000') || code.startsWith('001') || code.startsWith('002') || code.startsWith('003')) {
+                return '<span class="plate-tag tag-main">沪深主板</span>';
+            } else {
+                return '<span class="plate-tag" style="background-color: #718090;">其他</span>';
+            }
+        }
+
         function render(stockList) {
             const el = document.getElementById('stockList');
             let html = '';
             stockList.forEach(s => {
                 const url = getEastmoneyUrl(s.stockId);
+                const plateTag = getPlateTag(s.stockId);
                 html += `
                 <div class="stock-card">
                     <div class="stock-info">
-                        <div class="stock-name">${s.stockName}</div>
+                        <div class="stock-name">${s.stockName} ${plateTag}</div>
                         <div class="stock-code" onclick="window.open('${url}')">
                             ${s.stockId}（点击查看行情）
                         </div>
