@@ -2,430 +2,115 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A股段位测试 - 测测你是哪种操盘手</title>
+    <title>股票配置查看器</title>
     <style>
-        :root {
-            --primary-color: #ff4d4f; /* A股红 */
-            --secondary-color: #1890ff; /* 科技蓝 */
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-color: #333;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
         }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+            background: #f5f7fa;
         }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        header {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-            padding: 30px 20px;
+        .title {
             text-align: center;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            color: #2d3748;
         }
-
-        h1 {
-            margin: 0;
-            font-size: 28px;
-            color: #d93636;
-            font-weight: 800;
-        }
-
-        .subtitle {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #666;
-            font-weight: normal;
-        }
-
-        .quiz-body {
+        .stock-card {
+            background: white;
+            border-radius: 10px;
             padding: 20px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background-color: #f5f5f5;
-            border-radius: 3px;
-            margin-bottom: 25px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background-color: var(--primary-color);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .question-card {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .question-text {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-
-        .options {
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option-btn {
-            background: #fff;
-            border: 2px solid #e8e8e8;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: left;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .option-btn:hover {
-            border-color: var(--primary-color);
-            background-color: #fff1f0;
-            transform: translateY(-2px);
-        }
-
-        .option-btn.selected {
-            border-color: var(--primary-color);
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .start-btn, .next-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 30px;
-            transition: background 0.3s;
-        }
-
-        .start-btn:hover, .next-btn:hover {
-            background: #cf1322;
-        }
-
-        .result-card {
-            display: none;
-            text-align: center;
-            padding: 40px 20px;
-            animation: slideUp 0.5s ease;
-        }
-
-        .rank-badge {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            border-radius: 50%;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-            font-size: 40px;
         }
-
-        .rank-title {
-            font-size: 24px;
-            color: #d93636;
+        .stock-info {
+            flex: 2;
+        }
+        .stock-name {
+            font-size: 18px;
             font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .rank-desc {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 15px;
-        }
-
-        .analysis-box {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: left;
-            margin-top: 20px;
-            border-left: 4px solid var(--secondary-color);
-        }
-
-        .analysis-title {
-            font-weight: bold;
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 4px 8px;
-            background: #e6f7ff;
-            color: #1890ff;
-            border-radius: 4px;
-            font-size: 12px;
-            margin-right: 5px;
+            color: #2d3748;
             margin-bottom: 5px;
+        }
+        .stock-id {
+            color: #718096;
+            font-size: 14px;
+        }
+        .valuation {
+            flex: 1;
+            text-align: right;
+        }
+        .val-title {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+        .val-range {
+            font-size: 18px;
+            font-weight: bold;
+            color: #3182ce;
+        }
+        .tips {
+            text-align: center;
+            margin-top: 20px;
+            color: #a0aec0;
+            font-size: 13px;
         }
     </style>
 </head>
 <body>
+    <h1 class="title">股票估值配置表</h1>
+    <div id="stockList"></div>
+    <p class="tips">提示：修改 stockConfig.json 文件即可更新股票配置</p>
 
-<div class="container">
-    <header>
-        <h1>A股段位测试</h1>
-        <div class="subtitle">测测你是哪种流派的操盘手</div>
-    </header>
-
-    <div class="quiz-body">
-        <!-- 进度条 -->
-        <div class="progress-bar">
-            <div class="progress-fill" id="progress"></div>
-        </div>
-
-        <!-- 题目区域 -->
-        <div id="quiz-container"></div>
-
-        <!-- 结果区域 -->
-        <div id="result-container" class="result-card">
-            <div class="rank-badge" id="rank-icon"></div>
-            <div class="rank-title" id="result-title"></div>
-            <div class="rank-desc" id="result-desc"></div>
-            
-            <div class="analysis-box">
-                <span class="analysis-title"> 你的操盘风格</span>
-                <div id="result-style"></div>
-            </div>
-
-            <div class="analysis-box" style="border-left-color: #ff4d4f; margin-top: 15px;">
-                <span class="analysis-title"> 晋级建议</span>
-                <div id="result-advice"></div>
-            </div>
-
-            <button class="start-btn" onclick="location.reload()" style="margin-top: 20px; background: #333;">再测一次</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // 题目数据
-    const questions = [
-        {
-            text: "当你买入一只股票后，你预期的持股时间是？",
-            options: [
-                { text: "今天买明天卖，甚至做T+0", type: "short" },
-                { text: "拿个几天到两周，吃一段主升浪", type: "swing" },
-                { text: "几个月吧，等财报出来或者趋势坏了再走", type: "mid" },
-                { text: "几年甚至十年，只要公司逻辑不变就不动", type: "long" }
-            ]
-        },
-        {
-            text: "周末朋友聚会，大家都在聊股票，你会聊什么？",
-            options: [
-                { text: "哪个票今天涨停了，龙虎榜谁买的", type: "short" },
-                { text: "最近哪个板块图形走得好，要突破了", type: "swing" },
-                { text: "最近出了什么新政策，利好哪个行业", type: "mid" },
-                { text: "巴菲特最近买了啥，或者哪家公司的护城河深", type: "long" }
-            ]
-        },
-        {
-            text: "你打开炒股软件，主要看哪个界面？",
-            options: [
-                { text: "分时图、五档盘口、Level-2资金流向", type: "short" },
-                { text: "日K线、MACD、KDJ指标", type: "swing" },
-                { text: "周K线、均线系统、成交量", type: "mid" },
-                { text: "F10资料、财务报表、PE/PB估值", type: "long" }
-            ]
-        },
-        {
-            text: "如果股票跌了5%，你的第一反应是？",
-            options: [
-                { text: "坏了，情绪不对，赶紧跑，保住本金", type: "short" },
-                { text: "是不是破位了？看看支撑位还在不在", type: "swing" },
-                { text: "正常回调吧，只要没跌破20日线就拿着", type: "mid" },
-                { text: "太好了，便宜了，是不是该补仓了？", type: "long" }
-            ]
-        },
-        {
-            text: "你最痛恨哪种行为？",
-            options: [
-                { text: "踏空！看着别人涨停比自己亏钱还难受", type: "short" },
-                { text: "被洗盘！刚卖飞它就大涨", type: "swing" },
-                { text: "被套！明明看对了趋势，结果买在了山顶", type: "mid" },
-                { text: "公司暴雷！财务造假或者业绩变脸", type: "long" }
-            ]
-        },
-        {
-            text: "你的仓位管理风格是？",
-            options: [
-                { text: "全仓梭哈一只龙头，要么会所嫩模，要么下地干活", type: "short" },
-                { text: "分仓操作，一般持有2-3只，滚动操作", type: "swing" },
-                { text: "底仓+滚动仓，根据趋势好坏加减仓", type: "mid" },
-                { text: "重仓持有核心资产，平时基本不看账户", type: "long" }
-            ]
-        }
-    ];
-
-    // 段位定义
-    const ranks = {
-        short: [
-            { title: "追涨杀跌小韭菜", icon: "", score: 0 },
-            { title: "打板敢死队预备役", icon: "", score: 1 },
-            { title: "顶级游资操盘手", icon: "", score: 2 }
-        ],
-        swing: [
-            { title: "追涨杀跌小韭菜", icon: "", score: 0 },
-            { title: "波段操作老股民", icon: "", score: 1 },
-            { title: "趋势交易狙击手", icon: "", score: 2 }
-        ],
-        mid: [
-            { title: "追涨杀跌小韭菜", icon: "", score: 0 },
-            { title: "中线潜伏潜伏者", icon: "", score: 1 },
-            { title: "机构思维配置师", icon: "", score: 2 }
-        ],
-        long: [
-            { title: "追涨杀跌小韭菜", icon: "", score: 0 },
-            { title: "价值投资信徒", icon: "", score: 1 },
-            { title: "穿越牛熊大鳄", icon: "", score: 2 }
-        ]
-    };
-
-    let currentQuestion = 0;
-    let scores = { short: 0, swing: 0, mid: 0, long: 0 };
-
-    // 初始化
-    function init() {
-        renderQuestion();
-    }
-
-    // 渲染题目
-    function renderQuestion() {
-        const container = document.getElementById('quiz-container');
-        const q = questions[currentQuestion];
-        
-        // 更新进度条
-        const progress = ((currentQuestion) / questions.length) * 100;
-        document.getElementById('progress').style.width = `${progress}%`;
-
-        let html = `
-            <div class="question-card" style="display: block;">
-                <div class="question-text">${currentQuestion + 1}. ${q.text}</div>
-                <div class="options">
-        `;
-
-        q.options.forEach((opt, index) => {
-            html += `<div class="option-btn" onclick="selectOption('${opt.type}', this)">${opt.text}</div>`;
-        });
-
-        html += `</div></div>`;
-        container.innerHTML = html;
-    }
-
-    // 选择选项
-    function selectOption(type, element) {
-        // 视觉反馈
-        document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
-        element.classList.add('selected');
-
-        // 计分逻辑
-        scores[type]++;
-
-        // 延迟跳转
-        setTimeout(() => {
-            currentQuestion++;
-            if (currentQuestion < questions.length) {
-                renderQuestion();
-            } else {
-                showResult();
+    <script>
+        // 读取本地JSON配置文件
+        async function loadStockConfig() {
+            try {
+                // 读取同级目录下的 stockConfig.json
+                const response = await fetch('./stockConfig.json');
+                const stockList = await response.json();
+                renderStockList(stockList);
+            } catch (error) {
+                document.getElementById('stockList').innerHTML = 
+                    '<p style="text:center;color:red;">读取配置失败，请检查JSON文件是否存在</p>';
+                console.error('读取JSON失败：', error);
             }
-        }, 300);
-    }
+        }
 
-    // 显示结果
-    function showResult() {
-        document.getElementById('quiz-container').style.display = 'none';
-        document.getElementById('progress').style.width = '100%';
-        document.querySelector('.subtitle').innerText = "测试完成";
+        // 渲染股票列表到页面
+        function renderStockList(stockList) {
+            const container = document.getElementById('stockList');
+            let html = '';
 
-        // 找出最高分项
-        let maxType = 'short';
-        let maxScore = scores.short;
-        
-        // 简单的优先级逻辑，如果分数相同，优先显示更稳健的风格
-        if (scores.swing > maxScore) { maxType = 'swing'; maxScore = scores.swing; }
-        if (scores.mid > maxScore) { maxType = 'mid'; maxScore = scores.mid; }
-        if (scores.long > maxScore) { maxType = 'long'; maxScore = scores.long; }
+            stockList.forEach(stock => {
+                html += `
+                <div class="stock-card">
+                    <div class="stock-info">
+                        <div class="stock-name">${stock.stockName}</div>
+                        <div class="stock-id">股票ID：${stock.stockId}</div>
+                    </div>
+                    <div class="valuation">
+                        <div class="val-title">估值区间</div>
+                        <div class="val-range">${stock.valuationRange.low} ~ ${stock.valuationRange.high}</div>
+                    </div>
+                </div>
+                `;
+            });
 
-        // 根据分数确定等级 (0-1是初级，2-3是中级，4-6是高级)
-        let rankIndex = 0;
-        if (maxScore >= 2) rankIndex = 1;
-        if (maxScore >= 4) rankIndex = 2;
+            container.innerHTML = html;
+        }
 
-        const result = ranks[maxType][rankIndex];
-
-        // 渲染结果
-        document.getElementById('result-container').style.display = 'block';
-        document.getElementById('rank-icon').innerText = result.icon;
-        document.getElementById('result-title').innerText = result.title;
-        
-        // 风格描述
-        let styleText = "";
-        if (maxType === 'short') styleText = "你是**超短线流派**。你的世界只有今天和明天，追求资金的极致效率，喜欢热点题材和连板妖股。";
-        else if (maxType === 'swing') styleText = "你是**波段交易流派**。你像鳄鱼一样潜伏，不轻易出手，一旦出手就是为了吃掉最肥美的一段鱼身。";
-        else if (maxType === 'mid') styleText = "你是**中线趋势流派**。你关注行业景气度和业绩拐点，顺势而为，不在此山中，只缘身在此山中。";
-        else styleText = "你是**长线价投流派**。你相信复利的力量，把股票当成公司的股权，哪怕市场关门十年你也不慌。";
-        
-        document.getElementById('result-style').innerHTML = styleText;
-
-        // 建议
-        let adviceText = "";
-        if (rankIndex === 0) adviceText = "你现在还属于**入门阶段**，容易追涨杀跌。建议先模拟盘练习，建立自己的交易系统，严格止损。";
-        else if (rankIndex === 1) adviceText = "你已经**小有心得**，能稳定盈利或小亏。建议加强心态管理，不要因为一两次的失误而破坏交易规则。";
-        else adviceText = "恭喜你，你是**市场老手**！你的体系已经非常成熟，保持敬畏之心，控制回撤是你唯一的敌人。";
-        
-        document.getElementById('result-advice').innerHTML = adviceText;
-    }
-
-    // 启动
-    init();
-
-</script>
-
+        // 页面加载时执行
+        window.onload = loadStockConfig;
+    </script>
 </body>
 </html>

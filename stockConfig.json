@@ -1,0 +1,51 @@
+[
+  {
+    "stockName": "亚翔集成",
+    "stockId": "603929",
+    "valuationRange": {
+      "low": 0,
+      "high": 190
+    }
+  },
+  {
+    "stockName": "圣晖集成",
+    "stockId": "603163",
+    "valuationRange": {
+      "low": 0,
+      "high": 102
+    }
+  },
+  {
+    "stockName": "佰维存储",
+    "stockId": "688525",
+    "valuationRange": {
+      "low": 200,
+      "high": 274
+    }
+  },
+  {
+    "stockName": "中恒电气",
+    "stockId": "002364",
+    "valuationRange": {
+      "low": 0,
+      "high": 40
+    }
+  },
+  {
+    "stockName": "沪电股份",
+    "stockId": "002463",
+    "valuationRange": {
+      "low": 0,
+      "high": 116.9
+    }
+  }
+  ,
+  {
+    "stockName": "胜宏科技",
+    "stockId": "300476",
+    "valuationRange": {
+      "low": 0,
+      "high": 403
+    }
+  }
+]
