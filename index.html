@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>估值查看器</title>
+    <title>股票估值配置</title>
     <style>
         * {
             margin: 0;
@@ -40,9 +40,11 @@
             color: #2d3748;
             margin-bottom: 5px;
         }
-        .stock-id {
-            color: #718096;
+        .stock-code {
+            color: #3182ce;
             font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
         }
         .valuation {
             flex: 1;
@@ -50,7 +52,7 @@
         }
         .val-title {
             font-size: 14px;
-            color: #718096;
+            color: #718090;
             margin-bottom: 5px;
         }
         .val-range {
@@ -58,58 +60,60 @@
             font-weight: bold;
             color: #3182ce;
         }
-        .tips {
-            text-align: center;
-            margin-top: 20px;
-            color: #a0aec0;
-            font-size: 13px;
-        }
     </style>
 </head>
 <body>
     <h1 class="title">股票估值配置表</h1>
     <div id="stockList"></div>
-    <p class="tips">提示：修改 stockConfig.json 文件即可更新股票配置</p>
 
     <script>
-        // 读取本地JSON配置文件
         async function loadStockConfig() {
             try {
-                // 读取同级目录下的 stockConfig.json
-                const response = await fetch('./stockConfig.json');
-                const stockList = await response.json();
-                renderStockList(stockList);
-            } catch (error) {
-                document.getElementById('stockList').innerHTML = 
-                    '<p style="text:center;color:red;">读取配置失败，请检查JSON文件是否存在</p>';
-                console.error('读取JSON失败：', error);
+                const res = await fetch('./stockConfig.json');
+                const list = await res.json();
+                render(list);
+            } catch (err) {
+                document.getElementById('stockList').innerHTML = '<p style="color:red;">读取配置失败</p>';
             }
         }
 
-        // 渲染股票列表到页面
-        function renderStockList(stockList) {
-            const container = document.getElementById('stockList');
-            let html = '';
+        // 生成东方财富正确链接
+        function getEastmoneyUrl(code) {
+            if (code.startsWith('688')) {
+                // 科创板
+                return `https://quote.eastmoney.com/kcb/${code}.html`;
+            } else if (code.startsWith('6')) {
+                // 沪市
+                return `https://quote.eastmoney.com/sh${code}.html`;
+            } else {
+                // 深市（0、3开头）
+                return `https://quote.eastmoney.com/sz${code}.html`;
+            }
+        }
 
-            stockList.forEach(stock => {
+        function render(stockList) {
+            const el = document.getElementById('stockList');
+            let html = '';
+            stockList.forEach(s => {
+                const url = getEastmoneyUrl(s.stockId);
                 html += `
                 <div class="stock-card">
                     <div class="stock-info">
-                        <div class="stock-name">${stock.stockName}</div>
-                        <div class="stock-id">股票ID：${stock.stockId}</div>
+                        <div class="stock-name">${s.stockName}</div>
+                        <div class="stock-code" onclick="window.open('${url}')">
+                            ${s.stockId}（点击查看行情）
+                        </div>
                     </div>
                     <div class="valuation">
                         <div class="val-title">估值区间</div>
-                        <div class="val-range">${stock.valuationRange.low} ~ ${stock.valuationRange.high}</div>
+                        <div class="val-range">${s.valuationRange.low} ~ ${s.valuationRange.high}</div>
                     </div>
                 </div>
                 `;
             });
-
-            container.innerHTML = html;
+            el.innerHTML = html;
         }
 
-        // 页面加载时执行
         window.onload = loadStockConfig;
     </script>
 </body>
