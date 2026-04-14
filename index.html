@@ -18,8 +18,29 @@
         }
         .title {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             color: #2d3748;
+        }
+        /* 板块筛选按钮 */
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            background: #e2e8f0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .tab-btn.active {
+            background: #3182ce;
+            color: white;
         }
         .stock-card {
             background: white;
@@ -43,7 +64,6 @@
             align-items: center;
             gap: 10px;
         }
-        /* 板块标签样式 */
         .plate-tag {
             font-size: 12px;
             padding: 2px 8px;
@@ -51,15 +71,9 @@
             color: white;
             font-weight: normal;
         }
-        .tag-main {
-            background-color: #48bb78; /* 沪深主板-绿色 */
-        }
-        .tag-gem {
-            background-color: #ed8936; /* 创业板-橙色 */
-        }
-        .tag-tech {
-            background-color: #9f7aea; /* 科创板-紫色 */
-        }
+        .tag-main { background-color: #48bb78; } /* 主板绿 */
+        .tag-gem { background-color: #ed8936; } /* 创业橙 */
+        .tag-tech { background-color: #9f7aea; } /* 科创紫 */
         .stock-code {
             color: #3182ce;
             font-size: 14px;
@@ -84,57 +98,79 @@
 </head>
 <body>
     <h1 class="title">股票估值配置表</h1>
+
+    <!-- 筛选切换按钮 -->
+    <div class="filter-tabs">
+        <button class="tab-btn active" onclick="filterByPlate('all')">全部</button>
+        <button class="tab-btn" onclick="filterByPlate('main')">沪深主板</button>
+        <button class="tab-btn" onclick="filterByPlate('gem')">创业板</button>
+        <button class="tab-btn" onclick="filterByPlate('tech')">科创板</button>
+    </div>
+
     <div id="stockList"></div>
 
     <script>
+        let allStockList = []; // 保存全部股票
+
+        // 1. 加载JSON
         async function loadStockConfig() {
             try {
                 const res = await fetch('./stockConfig.json');
-                const list = await res.json();
-                list.sort((a, b) => parseInt(a.stockId) - parseInt(b.stockId));
-                render(list);
+                allStockList = await res.json();
+                allStockList.sort((a, b) => parseInt(a.stockId) - parseInt(b.stockId));
+                render(allStockList);
             } catch (err) {
                 document.getElementById('stockList').innerHTML = '<p style="color:red;">读取配置失败</p>';
             }
         }
 
-        // 生成东方财富正确链接
-        function getEastmoneyUrl(code) {
-            if (code.startsWith('688')) {
-                // 科创板
-                return `https://quote.eastmoney.com/kcb/${code}.html`;
-            } else if (code.startsWith('6')) {
-                // 沪市
-                return `https://quote.eastmoney.com/sh${code}.html`;
+        // 2. 板块筛选切换
+        function filterByPlate(plateType) {
+            // 按钮高亮
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            let filteredList = [];
+            if (plateType === 'all') {
+                filteredList = allStockList;
             } else {
-                // 深市（0、3开头）
-                return `https://quote.eastmoney.com/sz${code}.html`;
+                filteredList = allStockList.filter(s => getPlateType(s.stockId) === plateType);
             }
+            render(filteredList);
         }
 
-        // 获取股票板块标签
+        // 3. 获取板块类型（用于筛选）
+        function getPlateType(code) {
+            if (code.startsWith('688')) return 'tech';
+            if (code.startsWith('300')) return 'gem';
+            return 'main';
+        }
+
+        // 4. 获取板块标签（用于显示）
         function getPlateTag(code) {
-            if (code.startsWith('688')) {
-                return '<span class="plate-tag tag-tech">科创板</span>';
-            } else if (code.startsWith('300')) {
-                return '<span class="plate-tag tag-gem">创业板</span>';
-            } else if (code.startsWith('6') || code.startsWith('000') || code.startsWith('001') || code.startsWith('002') || code.startsWith('003')) {
-                return '<span class="plate-tag tag-main">沪深主板</span>';
-            } else {
-                return '<span class="plate-tag" style="background-color: #718090;">其他</span>';
-            }
+            if (code.startsWith('688')) return '<span class="plate-tag tag-tech">科创板</span>';
+            if (code.startsWith('300')) return '<span class="plate-tag tag-gem">创业板</span>';
+            return '<span class="plate-tag tag-main">沪深主板</span>';
         }
 
-        function render(stockList) {
+        // 5. 东方财富跳转
+        function getEastmoneyUrl(code) {
+            if (code.startsWith('688')) return `https://quote.eastmoney.com/kcb/${code}.html`;
+            if (code.startsWith('6')) return `https://quote.eastmoney.com/sh${code}.html`;
+            return `https://quote.eastmoney.com/sz${code}.html`;
+        }
+
+        // 6. 渲染页面
+        function render(list) {
             const el = document.getElementById('stockList');
             let html = '';
-            stockList.forEach(s => {
+            list.forEach(s => {
                 const url = getEastmoneyUrl(s.stockId);
-                const plateTag = getPlateTag(s.stockId);
+                const tag = getPlateTag(s.stockId);
                 html += `
                 <div class="stock-card">
                     <div class="stock-info">
-                        <div class="stock-name">${s.stockName} ${plateTag}</div>
+                        <div class="stock-name">${s.stockName} ${tag}</div>
                         <div class="stock-code" onclick="window.open('${url}')">
                             ${s.stockId}（点击查看行情）
                         </div>
@@ -143,10 +179,9 @@
                         <div class="val-title">估值区间</div>
                         <div class="val-range">${s.valuationRange.low} ~ ${s.valuationRange.high}</div>
                     </div>
-                </div>
-                `;
+                </div>`;
             });
-            el.innerHTML = html;
+            el.innerHTML = html || '<p style="text-align:center;color:#999">该板块暂无股票</p>';
         }
 
         window.onload = loadStockConfig;
