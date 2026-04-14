@@ -47,5 +47,53 @@
       "low": 0,
       "high": 403
     }
+  },
+  {
+    "stockName": "长川科技",
+    "stockId": "300604",
+    "valuationRange": {
+      "low": 151,
+      "high": 245.31
+    }
+  },
+  {
+    "stockName": "长芯博创",
+    "stockId": "300548",
+    "valuationRange": {
+      "low": 115.37,
+      "high": 134.21
+    }
+  },
+  {
+    "stockName": "长华光芯",
+    "stockId": "688048",
+    "valuationRange": {
+      "low": 140,
+      "high": 145.67
+    }
+  },
+  {
+    "stockName": "光库科技",
+    "stockId": "300620",
+    "valuationRange": {
+      "low": 162.3,
+      "high": 238
+    }
+  },
+  {
+    "stockName": "光迅科技",
+    "stockId": "002281",
+    "valuationRange": {
+      "low": 75.44,
+      "high": 94.3
+    }
+  },
+  {
+    "stockName": "太辰光",
+    "stockId": "300570",
+    "valuationRange": {
+      "low": 0,
+      "high": 153.3
+    }
   }
 ]
