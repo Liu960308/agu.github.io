@@ -3,7 +3,7 @@
     "stockName": "亚翔集成",
     "stockId": "603929",
     "valuationRange": {
-      "low": 0,
+      "low": 150.0,
       "high": 190
     }
   },
@@ -38,8 +38,7 @@
       "low": 0,
       "high": 116.9
     }
-  }
-  ,
+  },
   {
     "stockName": "胜宏科技",
     "stockId": "300476",
