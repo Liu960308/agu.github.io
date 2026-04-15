@@ -79,6 +79,15 @@
             font-size: 14px;
             cursor: pointer;
             text-decoration: underline;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .stock-price {
+            font-size: 14px;
+            color: #e53e3e; /* 红色突出股价 */
+        }
+        .stock-price.loading {
+            color: #999;
         }
         .valuation {
             flex: 1;
@@ -111,13 +120,20 @@
 
     <script>
         let allStockList = []; // 保存全部股票
+        const priceCache = new Map(); // 缓存股价，避免重复请求
 
-        // 1. 加载JSON
+        // 1. 加载JSON并获取股价
         async function loadStockConfig() {
             try {
                 const res = await fetch('./stockConfig.json');
                 allStockList = await res.json();
                 allStockList.sort((a, b) => parseInt(a.stockId) - parseInt(b.stockId));
+                
+                // 预加载所有股票的股价
+                await Promise.all(
+                    allStockList.map(stock => getStockPrice(stock.stockId))
+                );
+                
                 render(allStockList);
             } catch (err) {
                 document.getElementById('stockList').innerHTML = '<p style="color:red;">读取配置失败</p>';
@@ -160,19 +176,64 @@
             return `https://quote.eastmoney.com/sz${code}.html`;
         }
 
-        // 6. 渲染页面
+        // 6. 获取股票实时价格（核心：东方财富接口）
+        async function getStockPrice(stockCode) {
+            // 优先读取缓存
+            if (priceCache.has(stockCode)) {
+                return priceCache.get(stockCode);
+            }
+
+            try {
+                // 东方财富行情接口（拼接市场编码）
+                let marketCode = '';
+                if (stockCode.startsWith('6')) {
+                    marketCode = '1.' + stockCode; // 沪市
+                } else {
+                    marketCode = '0.' + stockCode; // 深市
+                }
+
+                // 请求实时股价
+                const res = await fetch(
+                    `https://push2.eastmoney.com/api/qt/stock/get?secid=${marketCode}&fields=f43`,
+                    {
+                        method: 'GET',
+                        mode: 'cors', // 跨域处理
+                        headers: {
+                            'Referer': 'https://www.eastmoney.com/', // 模拟来源，避免接口拦截
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                        }
+                    }
+                );
+
+                const data = await res.json();
+                const price = data.data?.f43 || '获取失败'; // f43 对应最新价字段
+                priceCache.set(stockCode, price); // 存入缓存
+                return price;
+            } catch (err) {
+                priceCache.set(stockCode, '获取失败');
+                return '获取失败';
+            }
+        }
+
+        // 7. 渲染页面（新增股价显示）
         function render(list) {
             const el = document.getElementById('stockList');
             let html = '';
             list.forEach(s => {
                 const url = getEastmoneyUrl(s.stockId);
                 const tag = getPlateTag(s.stockId);
+                const price = priceCache.get(s.stockId) || '加载中...';
+                const priceClass = price === '加载中...' ? 'loading' : '';
+
                 html += `
                 <div class="stock-card">
                     <div class="stock-info">
                         <div class="stock-name">${s.stockName} ${tag}</div>
                         <div class="stock-code" onclick="window.open('${url}')">
                             ${s.stockId}（点击查看行情）
+                        </div>
+                        <div class="stock-price ${priceClass}">
+                            当前股价：¥${price/100}
                         </div>
                     </div>
                     <div class="valuation">
