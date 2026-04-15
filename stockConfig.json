@@ -94,5 +94,13 @@
       "low": 0,
       "high": 153.3
     }
+  },
+  {
+    "stockId": "002891",
+    "stockName": "中宠股份",
+    "valuationRange": {
+      "low": 42.78,
+      "high": 50.48
+    }
   }
 ]
