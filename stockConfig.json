@@ -102,5 +102,37 @@
       "low": 42.78,
       "high": 50.48
     }
+  },
+  {
+    "stockId": "300857",
+    "stockName": "协创数据",
+    "valuationRange": {
+      "low": 158.13,
+      "high": 254.0
+    }
+  },
+  {
+    "stockId": "002714",
+    "stockName": "牧原股份",
+    "valuationRange": {
+      "low": 65.0,
+      "high": 70.0
+    }
+  },
+  {
+    "stockId": "603986",
+    "stockName": "兆易创新",
+    "valuationRange": {
+      "low": 205.44,
+      "high": 287.62
+    }
+  },
+  {
+    "stockId": "600111",
+    "stockName": "北方稀土",
+    "valuationRange": {
+      "low": 48.0,
+      "high": 81.0
+    }
   }
 ]
