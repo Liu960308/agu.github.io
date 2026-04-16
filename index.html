@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>股票估值查询</title>
+    <title>股票估值查询与综合计算工具</title>
     <style>
         * {
             margin: 0;
@@ -11,16 +11,42 @@
             font-family: "Microsoft YaHei", sans-serif;
         }
         body {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 0 20px;
             background: #f5f7fa;
+            padding: 0 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            position: relative;
         }
         .title {
             text-align: center;
             margin-bottom: 20px;
             color: #2d3748;
         }
+        .panel-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* ======================
+           ✅ 悬浮固定面板（不影响布局）
+           ====================== */
+        .calc-float {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            width: 380px;
+            z-index: 999;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        /* 股票列表样式 */
         .filter-tabs {
             display: flex;
             justify-content: center;
@@ -102,41 +128,160 @@
             font-weight: bold;
             color: #3182ce;
         }
+        /* 估值计算工具样式 */
+        .calc-title {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        #stockCode {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        #customPercent {
+            width: 100px;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+        #queryBtn {
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .result {
+            padding: 15px;
+            border-radius: 8px;
+            background: #f9fafb;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            display: none;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .label { font-weight: 500; color: #333; }
+        .value { font-weight: bold; font-size: 14px; }
+        .up { color: #e53e3e; }
+        .down { color: #38a169; }
+        .final {
+            font-size: 15px;
+            color: #fff;
+            background: #2563eb;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top:8px;
+        }
+        .loading {
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            display: none;
+            font-size:14px;
+        }
+        /* 响应式 */
+        @media (max-width: 1000px) {
+            .calc-float {
+                position: relative;
+                top: auto;
+                left: auto;
+                width: 100%;
+                margin-bottom:20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1 class="title">股票估值查询</h1>
 
-    <div class="filter-tabs">
-        <button class="tab-btn" data-type="all">全部</button>
-        <button class="tab-btn active" data-type="main">沪深主板</button>
-        <button class="tab-btn" data-type="gem">创业板</button>
-        <button class="tab-btn" data-type="tech">科创板</button>
+    <div class="container">
+        <h1 class="title">股票估值查询与计算工具</h1>
+
+        <!-- 悬浮：估值计算面板 -->
+        <div class="calc-float">
+            <h2 class="calc-title">估值计算</h2>
+            <div class="search-box">
+                <input type="text" id="stockCode" placeholder="只输入股票代码，如：300433、600000" value="300433">
+                <input type="text" id="customPercent" placeholder="自定义百分比(%)" value="15">
+                <button id="queryBtn">查询</button>
+            </div>
+            <div class="loading" id="loading">正在查询...</div>
+            <div class="result" id="result">
+                <div class="item">
+                    <div class="label">营业总收入同比增长</div>
+                    <div class="value" id="income"></div>
+                </div>
+                <div class="item">
+                    <div class="label">归属母公司净利润同比增长</div>
+                    <div class="value" id="profit"></div>
+                </div>
+                <div class="item">
+                    <div class="label">行业增速|流动性溢价</div>
+                    <div class="value" id="customPercentValue"></div>
+                </div>
+                <div class="item">
+                    <div class="label">2025年收盘价</div>
+                    <div class="value" id="close"></div>
+                </div>
+                <div class="final" id="final"></div>
+            </div>
+        </div>
+
+        <!-- 股票列表 → 现在完美居中，不偏移！ -->
+        <div class="panel-card">
+            <div class="filter-tabs">
+                <button class="tab-btn" data-type="all">全部</button>
+                <button class="tab-btn active" data-type="main">沪深主板</button>
+                <button class="tab-btn" data-type="gem">创业板</button>
+                <button class="tab-btn" data-type="tech">科创板</button>
+            </div>
+            <div id="stockList"></div>
+        </div>
     </div>
 
-    <div id="stockList"></div>
-
     <script>
+        // ==================== 股票列表逻辑 ====================
         let allStockList = [];
         let priceCache = new Map();
         let isRequesting = false;
 
-        // 页面加载
         window.onload = async () => {
-            const res = await fetch('./stockConfig.json');
-            allStockList = await res.json();
-			allStockList.sort((a,b)=>{return a.stockId - b.stockId;})
-            switchTab('main');
+            try {
+                const res = await fetch('./stockConfig.json');
+                allStockList = await res.json();
+                allStockList.sort((a,b)=>a.stockId - b.stockId)
+                switchTab('main');
+            } catch (e) {
+                console.error('加载失败',e);
+                document.getElementById('stockList').innerHTML = '<p style="text-align:center;color:#999">股票数据加载失败</p>';
+            }
+            bindCalcEvents();
         };
 
-        // 绑定按钮点击
         document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.onclick = () => {
-                switchTab(btn.dataset.type);
-            };
+            btn.onclick = () => switchTab(btn.dataset.type);
         });
 
-        // 切换板块
         async function switchTab(type) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelector(`[data-type="${type}"]`).classList.add('active');
@@ -145,40 +290,33 @@
             if (type !== 'all') {
                 list = allStockList.filter(s => getPlateType(s.stockId) === type);
             }
-
             render(list);
-            await loadPricesSlowly(list);
+            //await loadPricesSlowly(list);
         }
 
-        // 队列请求：0.5秒一个
         async function loadPricesSlowly(stockList) {
             if (isRequesting) return;
             isRequesting = true;
-
             for (let stock of stockList) {
                 const code = stock.stockId;
                 if (!priceCache.has(code)) {
                     await getStockPrice(code);
                     render(stockList);
-                    await delay(300);
+                    await delay(500);
                 }
             }
-
             isRequesting = false;
         }
 
-        // 获取价格 ✅ 修复：除以 100
         async function getStockPrice(stockCode) {
             try {
-                const secid = stockCode.startsWith('6') ? `1.${stockCode}` : `0.${stockCode}`;
-                const res = await fetch(`https://push2.eastmoney.com/api/qt/stock/get?secid=${secid}&fields=f43`, {
-                    headers: { Referer: 'https://www.eastmoney.com/' }
-                });
-                const data = await res.json();
-                let price = '失败';
-                if (data.data?.f43) {
-                    price = (data.data.f43 / 100).toFixed(2); // ✅ 这里除以100，保留2位小数
-                }
+                // const secid = stockCode.startsWith('6') ? `1.${stockCode}` : `0.${stockCode}`;
+                // const res = await fetch(`https://push2.eastmoney.com/api/qt/stock/get?secid=${secid}&fields=f43`, {
+                //     headers: { Referer: 'https://www.eastmoney.com/' }
+                // });
+                // const data = await res.json();
+                let price = '';
+                //if (data.data?.f43) price = (data.data.f43/100).toFixed(2);
                 priceCache.set(stockCode, price);
             } catch (e) {
                 priceCache.set(stockCode, '失败');
@@ -207,12 +345,11 @@
             return `https://quote.eastmoney.com/sz${code}.html`;
         }
 
-        // 渲染
         function render(list) {
             const el = document.getElementById('stockList');
             let html = '';
             list.forEach(s => {
-                const price = priceCache.get(s.stockId) || '加载中...';
+                const price = priceCache.get(s.stockId) || '未获取';
                 html += `
                 <div class="stock-card">
                     <div class="stock-info">
@@ -229,6 +366,112 @@
                 </div>`;
             });
             el.innerHTML = html || '<p style="text-align:center;color:#999">该板块暂无股票</p>';
+        }
+
+        // ==================== 估值计算逻辑 ====================
+        function bindCalcEvents() {
+            const codeInput = document.getElementById('stockCode');
+            const queryBtn = document.getElementById('queryBtn');
+            queryBtn.onclick = startCalc;
+            codeInput.addEventListener('keypress', e=> e.key==='Enter'&&startCalc());
+            
+            // 自定义百分比输入框回车触发查询
+            const percentInput = document.getElementById('customPercent');
+            percentInput.addEventListener('keypress', e=> e.key==='Enter'&&startCalc());
+        }
+
+        function getFullCode(code) {
+            code = code.trim();
+            return (code.startsWith('6') || code.startsWith('9')) ? code + '.SH' : code + '.SZ';
+        }
+
+        async function getLastClose(code) {
+            const secid = code.startsWith('6') ? `1.${code}` : `0.${code}`;
+            const url = `https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=${secid}&fields1=f1,f2,f3,f4,f5&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=0&beg=20250101&end=20251231`;
+            const res = await fetch(url);
+            const json = await res.json();
+            if(!json?.data?.klines?.length) return null;
+            const last = json.data.klines.at(-1).split(',');
+            return { date: last[0], close: parseFloat(last[2]) };
+        }
+
+        async function startCalc() {
+            const codeInput = document.getElementById('stockCode');
+            const percentInput = document.getElementById('customPercent');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const incomeEl = document.getElementById('income');
+            const profitEl = document.getElementById('profit');
+            const customPercentEl = document.getElementById('customPercentValue');
+            const closeEl = document.getElementById('close');
+            const finalEl = document.getElementById('final');
+
+            let code = codeInput.value.trim();
+            let customPercent = percentInput.value.trim();
+            
+            // 验证输入
+            if(!code || !/^\d{6}$/.test(code)) return alert('请输入6位股票代码');
+            if(!customPercent || isNaN(parseFloat(customPercent))) return alert('请输入有效的百分比数值');
+            
+            // 处理百分比值（支持带%符号和不带%符号两种输入）
+            customPercent = customPercent.replace('%', '');
+            const customPercentNum = parseFloat(customPercent);
+            if(customPercentNum < 0) return alert('百分比不能为负数');
+
+            loading.style.display='block';
+            result.style.display='none';
+
+            try {
+                const fullCode = getFullCode(code);
+                const financeUrl = `https://datacenter.eastmoney.com/securities/api/data/v1/get?reportName=RPT_F10_FINANCE_DUPONT&columns=REPORT_DATE,REPORT_TYPE,TOTAL_OPERATE_INCOME,PARENT_NETPROFIT&filter=(SECUCODE%3D%22${fullCode}%22)&pageNumber=1&pageSize=20&sortTypes=-1&sortColumns=REPORT_DATE`;
+                const fRes = await fetch(financeUrl);
+                const fJson = await fRes.json();
+                const list = fJson.result?.data || [];
+
+                const curr = list[0];
+                if(!curr) throw new Error('无财务数据');
+
+                const currType = curr.REPORT_TYPE.replace(/[0-9\-]/g, '').trim();
+                const last = list.find(item => 
+                    item.REPORT_TYPE.replace(/[0-9\-]/g, '').trim() === currType && item !== curr
+                );
+                if(!last) throw new Error('未找到同期财报');
+
+                const income = (((curr.TOTAL_OPERATE_INCOME / last.TOTAL_OPERATE_INCOME) - 1) * 100).toFixed(2);
+                const profit = (((curr.PARENT_NETPROFIT / last.PARENT_NETPROFIT) - 1) * 100).toFixed(2);
+                const price = await getLastClose(code);
+                if(!price) throw new Error('无收盘价数据');
+
+                // 计算因子
+                const inc = (1 + parseFloat(income) / 100).toFixed(4);
+                const pro = (1 + parseFloat(profit) / 100).toFixed(4);
+                const customFactor = (1 + customPercentNum / 100).toFixed(4);
+                
+                // 纳入自定义百分比计算最终估值
+                let finalValue = 0
+                if(inc < 1) {
+                    // 营收增长为负时：收盘价 × 营收增长 × 自定义百分比
+                    finalValue = (price.close * inc * customFactor).toFixed(2);
+                } else {
+                    // 营收增长为正时：收盘价 × 营收增长 × 净利润增长 × 自定义百分比
+                    finalValue = (price.close * inc * pro * customFactor).toFixed(2);
+                }
+
+                // 更新显示
+                incomeEl.textContent = income+'%';
+                incomeEl.className = 'value '+(income>=0?'up':'down');
+                profitEl.textContent = profit+'%';
+                profitEl.className = 'value '+(profit>=0?'up':'down');
+                customPercentEl.textContent = customPercentNum+'%';
+                closeEl.textContent = price.close + ' 元';
+                finalEl.textContent = `综合估值结果：¥${finalValue}`;
+                
+                result.style.display='block';
+            } catch(e) {
+                alert('错误：'+e.message);
+            } finally {
+                loading.style.display='none';
+            }
         }
     </script>
 </body>
