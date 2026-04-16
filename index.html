@@ -228,6 +228,10 @@
             <div class="loading" id="loading">正在查询...</div>
             <div class="result" id="result">
                 <div class="item">
+                    <div class="label">名称</div>
+                    <div class="value" id="abbr"></div>
+                </div>
+                <div class="item">
                     <div class="label">营业总收入同比增长</div>
                     <div class="value" id="income"></div>
                 </div>
@@ -401,6 +405,7 @@
             const loading = document.getElementById('loading');
             const result = document.getElementById('result');
             const incomeEl = document.getElementById('income');
+            const abbr = document.getElementById('abbr');
             const profitEl = document.getElementById('profit');
             const customPercentEl = document.getElementById('customPercentValue');
             const closeEl = document.getElementById('close');
@@ -423,7 +428,7 @@
 
             try {
                 const fullCode = getFullCode(code);
-                const financeUrl = `https://datacenter.eastmoney.com/securities/api/data/v1/get?reportName=RPT_F10_FINANCE_DUPONT&columns=REPORT_DATE,REPORT_TYPE,TOTAL_OPERATE_INCOME,PARENT_NETPROFIT&filter=(SECUCODE%3D%22${fullCode}%22)&pageNumber=1&pageSize=20&sortTypes=-1&sortColumns=REPORT_DATE`;
+                const financeUrl = `https://datacenter.eastmoney.com/securities/api/data/v1/get?reportName=RPT_F10_FINANCE_DUPONT&columns=REPORT_DATE,REPORT_TYPE,TOTAL_OPERATE_INCOME,PARENT_NETPROFIT,SECURITY_NAME_ABBR&filter=(SECUCODE%3D%22${fullCode}%22)&pageNumber=1&pageSize=20&sortTypes=-1&sortColumns=REPORT_DATE`;
                 const fRes = await fetch(financeUrl);
                 const fJson = await fRes.json();
                 const list = fJson.result?.data || [];
@@ -458,6 +463,7 @@
                 }
 
                 // 更新显示
+                abbr.textContent = curr.SECURITY_NAME_ABBR;
                 incomeEl.textContent = income+'%';
                 incomeEl.className = 'value '+(income>=0?'up':'down');
                 profitEl.textContent = profit+'%';
