@@ -142,5 +142,69 @@
       "low": 388.0,
       "high": 582.4
     }
+  },
+  {
+    "stockId": "002222",
+    "stockName": "福晶科技",
+    "valuationRange": {
+      "low": 71.34,
+      "high": 92.56
+    }
+  },
+  {
+    "stockId": "688362",
+    "stockName": "甬矽电子",
+    "valuationRange": {
+      "low": 48.25,
+      "high": 76.86
+    }
+  },
+  {
+    "stockId": "688627",
+    "stockName": "精益达",
+    "valuationRange": {
+      "low": 250.75,
+      "high": 310.0
+    }
+  },
+  {
+    "stockId": "688392",
+    "stockName": "骄成超声",
+    "valuationRange": {
+      "low": 143.09,
+      "high": 185.07
+    }
+  },
+  {
+    "stockId": "HK1347",
+    "stockName": "化工半导体",
+    "valuationRange": {
+      "low": 89.03,
+      "high": 119.22
+    }
+  },
+  {
+    "stockId": "688652",
+    "stockName": "京仪装备",
+    "valuationRange": {
+      "low": 139.0,
+      "high": 140.0
+    }
+  },
+  {
+    "stockId": "301421",
+    "stockName": "波长广电",
+    "valuationRange": {
+      "low": 108.55,
+      "high": 129.83
+    }
+  },
+  {
+    "stockId": "688072",
+    "stockName": "拓荆科技",
+    "valuationRange": {
+      "low": 503.5,
+      "high": 611.0
+    }
   }
 ]
