@@ -198,5 +198,13 @@
       "low": 503.5,
       "high": 611.0
     }
+  },
+  {
+    "stockId": "300442",
+    "stockName": "润泽科技",
+    "valuationRange": {
+      "low": 60.75,
+      "high": 88.61
+    }
   }
 ]
