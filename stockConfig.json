@@ -176,14 +176,6 @@
     }
   },
   {
-    "stockId": "HK1347",
-    "stockName": "化工半导体",
-    "valuationRange": {
-      "low": 89.03,
-      "high": 119.22
-    }
-  },
-  {
     "stockId": "688652",
     "stockName": "京仪装备",
     "valuationRange": {
