@@ -134,5 +134,13 @@
       "low": 48.0,
       "high": 81.0
     }
+  },
+  {
+    "stockId": "300502",
+    "stockName": "新易盛",
+    "valuationRange": {
+      "low": 388.0,
+      "high": 582.4
+    }
   }
 ]
