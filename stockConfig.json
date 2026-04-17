@@ -206,5 +206,13 @@
       "low": 60.75,
       "high": 88.61
     }
+  },
+  {
+    "stockId": "002156",
+    "stockName": "通富微电",
+    "valuationRange": {
+      "low": 37.45,
+      "high": 68.56
+    }
   }
 ]
