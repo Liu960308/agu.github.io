@@ -214,5 +214,13 @@
       "low": 37.45,
       "high": 68.56
     }
+  },
+  {
+    "stockId": "688502",
+    "stockName": "茂莱光学",
+    "valuationRange": {
+      "low": 360.0,
+      "high": 477.85
+    }
   }
 ]
