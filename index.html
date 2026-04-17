@@ -483,7 +483,8 @@
 
             try {
                 const fullCode = getFullCode(code);
-                const financeUrl = `https://datacenter.eastmoney.com/securities/api/data/v1/get?reportName=RPT_F10_FINANCE_DUPONT&columns=REPORT_DATE,REPORT_TYPE,TOTAL_OPERATE_INCOME,PARENT_NETPROFIT,SECURITY_NAME_ABBR&filter=(SECUCODE%3D%22${fullCode}%22)&pageNumber=1&pageSize=20&sortTypes=-1&sortColumns=REPORT_DATE`;
+                const columns = 'REPORT_DATE,REPORT_TYPE,TOTAL_OPERATE_INCOME,PARENT_NETPROFIT,SECURITY_NAME_ABBR,NETPROFIT'
+                const financeUrl = `https://datacenter.eastmoney.com/securities/api/data/v1/get?reportName=RPT_F10_FINANCE_DUPONT&columns=${columns}&filter=(SECUCODE%3D%22${fullCode}%22)&pageNumber=1&pageSize=20&sortTypes=-1&sortColumns=REPORT_DATE`;
                 const fRes = await fetch(financeUrl);
                 const fJson = await fRes.json();
                 const list = fJson.result?.data || [];
@@ -496,6 +497,10 @@
                     item.REPORT_TYPE.replace(/[0-9\-]/g, '').trim() === currType && item !== curr
                 );
                 if (!last) throw new Error('未找到同期财报');
+
+                const lastYear = list.find(item =>
+                    item.REPORT_TYPE.replace(/[0-9\-]/g, '').trim() === "年报" && item !== curr
+                );
 
                 const income = (((curr.TOTAL_OPERATE_INCOME / last.TOTAL_OPERATE_INCOME) - 1) * 100).toFixed(2);
                 const profit = (((curr.PARENT_NETPROFIT / last.PARENT_NETPROFIT) - 1) * 100).toFixed(2);
@@ -513,8 +518,13 @@
                     // 营收增长为负时：收盘价 × 营收增长 × 自定义百分比
                     finalValue = (price.close * inc * customFactor).toFixed(2);
                 } else {
-                    // 营收增长为正时：收盘价 × 营收增长 × 净利润增长 × 自定义百分比
-                    finalValue = (price.close * inc * pro * customFactor).toFixed(2);
+                    if (last.REPORT_TYPE.endsWith("年报")) {
+                        // 营收增长为正时：收盘价 × 营收增长 × 净利润增长 × 自定义百分比
+                        finalValue = (price.close * inc * customFactor).toFixed(2);
+                    } else {
+                        //最高价*营业总收入同比增长*(1季度净利润*4个季度/去年整年营收)
+                        finalValue = (price.close * inc * (curr.NETPROFIT * 4 / lastYear.NETPROFIT) * customFactor).toFixed(2);
+                    }
                 }
 
                 // 更新显示
