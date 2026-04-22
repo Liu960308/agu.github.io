@@ -123,8 +123,8 @@
     "stockId": "603986",
     "stockName": "兆易创新",
     "valuationRange": {
-      "low": 205.44,
-      "high": 287.62
+      "low": 337.0,
+      "high": 373.0
     }
   },
   {
@@ -229,6 +229,14 @@
     "valuationRange": {
       "low": 65.0,
       "high": 77.0
+    }
+  },
+  {
+    "stockId": "000938",
+    "stockName": "紫光股份",
+    "valuationRange": {
+      "low": 0.0,
+      "high": 30.0
     }
   }
 ]
