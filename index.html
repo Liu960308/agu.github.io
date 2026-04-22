@@ -260,6 +260,22 @@
                 margin-bottom: 20px;
             }
         }
+
+        #capitalFlowBtn {
+  padding: 10px 20px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+#capitalFlowBtn:hover {
+  background: #059669;
+}
     </style>
 </head>
 
@@ -275,6 +291,7 @@
                 <input type="text" id="stockCode" placeholder="只输入股票代码，如：300433、600000" value="300433">
                 <input type="text" id="customPercent" placeholder="自定义百分比(%)" value="5">
                 <button id="queryBtn">查询</button>
+                <a href="https://data.eastmoney.com/zjlx/dpzjlx.html" target="_blank" id="capitalFlowBtn">大盘资金流向</a>
             </div>
             <div class="loading" id="loading">正在查询...</div>
             <div class="result" id="result">
