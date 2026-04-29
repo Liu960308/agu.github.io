@@ -254,5 +254,13 @@
       "low": 0.0,
       "high": 490.0
     }
+  },
+  {
+    "stockId": "601138",
+    "stockName": "工业富联",
+    "valuationRange": {
+      "low": 68.5,
+      "high": 78.61
+    }
   }
 ]
