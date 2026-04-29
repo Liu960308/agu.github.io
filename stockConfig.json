@@ -246,5 +246,13 @@
       "low": 179.12,
       "high": 205.53
     }
+  },
+  {
+    "stockId": "301308",
+    "stockName": "江波龙",
+    "valuationRange": {
+      "low": 0.0,
+      "high": 490.0
+    }
   }
 ]
