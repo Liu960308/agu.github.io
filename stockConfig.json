@@ -238,5 +238,13 @@
       "low": 0.0,
       "high": 30.0
     }
+  },
+  {
+    "stockId": "300475",
+    "stockName": "香农芯创",
+    "valuationRange": {
+      "low": 179.12,
+      "high": 205.53
+    }
   }
 ]
